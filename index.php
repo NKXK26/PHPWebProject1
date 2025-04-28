@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Create a personalized message
         $message = "Hello, $name! You are $age years old.";
     } else {
-        $message = "Please enter bwwoth your name and age.";
+        $message = "Please enter both your name and age.";
     }
 }
 ?>
