@@ -1,14 +1,14 @@
-# Use official Python image
-FROM python:3.11-slim
+# Use an official PHP image
+FROM php:7.4-apache
 
-# Set the working directory
-WORKDIR /app
+# Set the working directory inside the container
+WORKDIR /var/www/html
 
-# Copy the app files
-COPY . .
+# Copy the PHP files into the container
+COPY . /var/www/html/
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Expose the port the app runs on
+EXPOSE 80
 
-# Run the app
-CMD ["python", "app.py"]
+# Ensure Apache is running
+CMD ["apache2-foreground"]
