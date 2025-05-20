@@ -26,7 +26,6 @@ pipeline {
         }
         stage('Terraform Apply') {
             steps {
-                input message: 'Approve Terraform Apply?'
                 bat '''
                     terraform apply -auto-approve ^
                       -var "aws_access_key=%AWS_ACCESS_KEY_ID%" ^
