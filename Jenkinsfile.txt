@@ -1,35 +1,51 @@
 pipeline {
     agent any
-    tools {
-        terraform 'teraform-11'
-    }
-    environment {
-        AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
-        AWS_DEFAULT_REGION = 'ap-southeast-1'
 
+    tools {
+        terraform 'terraform-11'   // Make sure this matches your Terraform tool name in Jenkins
     }
+
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')      // Jenkins credential ID for AWS access key
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')  // Jenkins credential ID for AWS secret key
+        AWS_DEFAULT_REGION    = 'ap-southeast-1'
+    }
+
     stages {
-        stage('Git checkout') {
+        stage('Git Checkout') {
             steps {
                 checkout scmGit(
                     branches: [[name: '*/master']],
                     extensions: [],
                     userRemoteConfigs: [[url: 'https://github.com/NKXK26/PHPWebProject1.git']]
-                ) 
+                )
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
                 bat '''
                     terraform plan ^
                       -var "aws_access_key=%AWS_ACCESS_KEY_ID%" ^
-                      -var "aws_secret_key=%AWS_SECRET_ACCESS_KEY%"
+                      -var "aws_secret_key=%AWS_SECRET_ACCESS_KEY%" ^
+                      -var "aws_region=%AWS_DEFAULT_REGION%"
                 '''
             }
         }
+
+        stage('Approve Terraform Apply') {
+            steps {
+                input message: 'Approve Terraform Apply?'
+            }
+        }
+
         stage('Terraform Apply') {
             steps {
                 bat '''
                     terraform apply -auto-approve ^
                       -var "aws_access_key=%AWS_ACCESS_KEY_ID%" ^
-                      -var "aws_secret_key=%AWS_SECRET_ACCESS_KEY%"
+                      -var "aws_secret_key=%AWS_SECRET_ACCESS_KEY%" ^
+                      -var "aws_region=%AWS_DEFAULT_REGION%"
                 '''
             }
         }
