@@ -1,37 +1,29 @@
-variable "aws_access_key" {
-  description = "AWS access key"
-  type        = string
-  default     = ""
+provider "aws" {
+  region     = "${var.aws_region}"
+  access_key = "${var.aws_access_key}"
+  secret_key = "${var.aws_secret_key}"
 }
 
-variable "aws_secret_key" {
-  description = "AWS secret key"
-  type        = string
-  default     = ""
+data "aws_ami" "latest_amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
 }
 
-variable "aws_region" {
-  description = "AWS region"
-  type        = string
-  default     = "ap-south-1"
-}
+resource "aws_instance" "public_instance" {
+  ami           = "${data.aws_ami.latest_amazon_linux.id}"
+  instance_type = "t2.micro"
 
-
-variable "ami" {
-   type        = string
-   description = "Ubuntu AMI ID"
-   default     = "ami-06cd52961ce9f0d85"
-
-}
-
-variable "instance_type" {
-   type        = string
-   description = "Instance type"
-   default     = "t2.micro"
-}
-
-variable "name_tag" {
-   type        = string
-   description = "Name of the EC2 instance"
-   default     = "My EC2 Instance"
+  tags {
+    Name = "My EC2 Instance"
+  }
 }
